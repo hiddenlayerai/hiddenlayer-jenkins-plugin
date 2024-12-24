@@ -118,12 +118,24 @@
       <version>5.4.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.hiddenlayer</groupId>
+      <artifactId>hiddenlayer-sdk</artifactId>
+      <version>0.0.4</version>
+    </dependency>
   </dependencies>
 
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/hiddenlayerai/hiddenlayer-sdk-java</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <pluginRepositories>
