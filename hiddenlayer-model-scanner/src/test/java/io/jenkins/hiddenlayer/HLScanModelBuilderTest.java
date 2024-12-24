@@ -1,4 +1,4 @@
-package com.hiddenlayer.jenkins;
+package io.jenkins.hiddenlayer;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hiddenlayer.ModelScanService;
+import com.hiddenlayer.sdk.ModelScanService;
 import hiddenlayer.sdk.ApiException;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
@@ -14,7 +14,6 @@ import hudson.model.Label;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
-
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -23,8 +22,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.openapitools.client.model.ModelInventoryInfo;
-import org.openapitools.client.model.ScanReportV3;
+import com.hiddenlayer.sdk.rest.models.ModelInventoryInfo;
+import com.hiddenlayer.sdk.rest.models.ScanReportV3;
 
 public class HLScanModelBuilderTest {
 
@@ -100,7 +99,7 @@ public class HLScanModelBuilderTest {
         ModelScanServiceFactory.setTestInstance(mockModelScanService);
 
         String agentLabel = "my-agent";
-        jenkins.createOnlineSlave(Label.get(agentLabel));   // this Jenkins method name needs updating
+        jenkins.createOnlineSlave(Label.get(agentLabel)); // this Jenkins method name needs updating
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript = "node {hlScanModel modelName: '" + modelName
                 + "', hlClientId: '" + hlClientId

@@ -10,8 +10,8 @@
     <relativePath />
   </parent>
 
-  <groupId>com.hiddenlayer.jenkins</groupId>
-  <artifactId>hiddenlayer-model-scanner-plugin</artifactId>
+  <groupId>io.jenkins.plugins</groupId>
+  <artifactId>hiddenlayer-model-scanner</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
@@ -61,6 +61,12 @@
   </dependencyManagement>
   <dependencies>
 
+    <dependency>
+      <groupId>com.hiddenlayer</groupId>
+      <artifactId>hiddenlayer-sdk</artifactId>
+      <version>0.0.4</version>
+    </dependency>
+
     <!-- JSON processing: jackson -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -76,6 +82,10 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
       <version>${jackson-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci</groupId>
+      <artifactId>symbol-annotation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -113,6 +123,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-step-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>5.4.0</version>
@@ -133,9 +148,6 @@
     <repository>
       <id>github</id>
       <url>https://maven.pkg.github.com/hiddenlayerai/hiddenlayer-sdk-java</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
     </repository>
   </repositories>
   <pluginRepositories>
