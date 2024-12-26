@@ -39,16 +39,24 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
     // Folder containing the model to be scanned, relative to the workspace.
     private String folderToScan;
 
+    // Fail the build if the model is of an unsupported type
+    private boolean failOnUnsupported;
+
+    // Fail the build if the model has a severity level greater than or equal to the specified level
+    private String failOnSeverity;
+
     // Service used to call the HiddenLayer Model Scanner.
     // Mark it as transient so it won't be serialized with the object, to avoid security problems.
     private transient ModelScanService modelScanService;
 
     @DataBoundConstructor
-    public HLScanModelBuilder(String modelName, String hlClientId, String hlClientSecret, String folderToScan) {
+    public HLScanModelBuilder(String modelName, String hlClientId, String hlClientSecret, String folderToScan, boolean failOnUnsupported, String failOnSeverity) {
         this.modelName = modelName;
         this.hlClientId = hlClientId;
         setHlClientSecret(hlClientSecret);
         this.folderToScan = folderToScan;
+        this.failOnUnsupported = failOnUnsupported;
+        this.failOnSeverity = failOnSeverity;
     }
 
     public String getModelName() {
@@ -87,6 +95,24 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
         this.folderToScan = folderToScan;
     }
 
+    public boolean getFailOnUnsupported() {
+        return failOnUnsupported;
+    }
+
+    @DataBoundSetter
+    public void setFailOnUnsupported(boolean failOnUnsupported) {
+        this.failOnUnsupported = failOnUnsupported;
+    }
+
+    public String getFailOnSeverity() {
+        return failOnSeverity;
+    }
+
+    @DataBoundSetter
+    public void setFailOnSeverity(String failOnSeverity) {
+        this.failOnSeverity = failOnSeverity;
+    }
+
     public ModelScanService getModelScanService() {
         return modelScanService;
     }
@@ -121,7 +147,49 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
             // Summarize the scan results for the user
             String summary = ScanReporter.summarizeScan(report);
             listener.getLogger().print(summary);
-
+            if (failOnUnsupported && report.getSeverity() == SeverityEnum.UNKNOWN) {
+                throw new AbortException("Model type is not supported by HiddenLayer");
+            }
+            if (!failOnSeverity.isEmpty()) {
+                SeverityEnum reportSeverity = report.getSeverity();
+                // just kick out if SAFE or UNKNOWN
+                if (reportSeverity != SeverityEnum.UNKNOWN && reportSeverity != SeverityEnum.SAFE) {
+                    SeverityEnum failSeverity = SeverityEnum.valueOf(failOnSeverity.toUpperCase());
+                    switch (reportSeverity) {
+                        case LOW:
+                            if (failSeverity == SeverityEnum.LOW) {
+                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                                throw new AbortException("Model has severity level " + reportSeverity);
+                            }
+                            listener.getLogger().println("Model has severity level LOW");
+                            break;
+                        case MEDIUM:
+                            if (failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
+                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                                throw new AbortException("Model has severity level " + reportSeverity);
+                            }
+                            listener.getLogger().println("Model has severity level MEDIUM");
+                            break;
+                        case HIGH:
+                            if (failSeverity == SeverityEnum.HIGH || failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
+                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                                throw new AbortException("Model has severity level " + reportSeverity);
+                            }
+                            break;
+                        case CRITICAL:
+                            throw new AbortException("Model has severity level " + reportSeverity);
+                        default:
+                            listener.getLogger().println("Model has unknown severity level");
+                            break;
+                    }
+                    if (reportSeverity.compareTo(failSeverity) >= 0) {
+                        listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                        throw new AbortException("Model has severity level " + reportSeverity);
+                    }
+                }
+            }
+        } catch (AbortException e) {
+            throw e;
         } catch (Exception e) {
             listener.getLogger().println("Error scanning model: " + e.getMessage());
             StringWriter writer = new StringWriter();
@@ -181,6 +249,26 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.error("Folder to scan cannot be empty");
             }
             return FormValidation.ok();
+        }
+
+        public FormValidation doCheckFailOnUnsupported(@QueryParameter boolean value) {
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckFailOnSeverity(@QueryParameter String value) {
+            if (value == null || value.trim().isEmpty()) {
+                return FormValidation.ok();
+            }
+            String severity = value.trim().toLowerCase();
+            switch(severity) {
+                case "low":
+                case "medium":
+                case "high":
+                case "critical":
+                    return FormValidation.ok();
+                default:
+                    return FormValidation.error("Invalid severity level: " + severity);
+            }
         }
     }
 }

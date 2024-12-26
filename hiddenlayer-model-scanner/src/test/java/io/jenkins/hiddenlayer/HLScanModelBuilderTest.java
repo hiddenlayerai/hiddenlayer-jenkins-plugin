@@ -43,6 +43,8 @@ public class HLScanModelBuilderTest {
     private String modelVersion = "1.0.0";
     private String modelId = "model-id";
     private String scanId = "scan-id";
+    private boolean failUnsupported = false;
+    private String failSeverity = "LOW";
 
     @Before
     public void setUp() throws IOException, URISyntaxException, InterruptedException, Exception {
@@ -75,7 +77,7 @@ public class HLScanModelBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan);
+        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
         project.getBuildersList().add(builder);
 
         // Save and reload the project configuration
@@ -123,7 +125,7 @@ public class HLScanModelBuilderTest {
     }
 
     private HLScanModelBuilder createBuilder() {
-        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan);
+        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
         builder.setModelScanService(mockModelScanService);
         return builder;
     }
