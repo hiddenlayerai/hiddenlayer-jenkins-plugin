@@ -13,9 +13,6 @@ jobs:
   build:
     name: Build HiddenLayer Java SDK
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ 17, 21 ]
     steps:
     - name: Harden Runner
       uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
@@ -26,7 +23,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
       with:
-        java-version: ${{ matrix.java }}
+        java-version: 17
         distribution: 'temurin'
         cache: maven
     - name: Run tests with Maven
