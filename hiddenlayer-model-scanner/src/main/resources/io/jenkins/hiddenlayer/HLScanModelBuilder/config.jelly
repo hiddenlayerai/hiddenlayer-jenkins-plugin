@@ -17,4 +17,7 @@
     <f:entry title="Fail Pipeline on Unsupported model" field="failOnUnsupported">
         <f:checkbox/>
     </f:entry>
+    <f:entry title="Fail on Severity" field="failOnSeverity">
+        <f:textbox/>
+    </f:entry>
 </j:jelly>
