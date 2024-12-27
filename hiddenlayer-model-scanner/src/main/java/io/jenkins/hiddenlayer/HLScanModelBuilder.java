@@ -137,7 +137,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener)
             throws InterruptedException, IOException, AbortException {
         // Keep this log message in sync with scanMessage in HLScanModelBuilderTest.java
-        listener.getLogger().printf("Scanning model %s in folder %s ...\n", modelName, folderToScan);
+        listener.getLogger().printf("Scanning model %s in folder %s ...%n", modelName, folderToScan);
 
         try {
             // Initialize the ModelScanService if needed (tests may inject a mock service)
@@ -166,30 +166,38 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                         case LOW:
                             if (failSeverity == SeverityEnum.LOW) {
                                 listener.getLogger()
-                                        .println("Failing build due to model having severity level " + reportSeverity);
-                                throw new AbortException("Model has severity level " + reportSeverity);
+                                        .printf(
+                                                "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
+                                                reportSeverity, failSeverity);
+                                throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
-                            listener.getLogger().println("Model has severity level LOW");
                             break;
                         case MEDIUM:
                             if (failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
                                 listener.getLogger()
-                                        .println("Failing build due to model having severity level " + reportSeverity);
-                                throw new AbortException("Model has severity level " + reportSeverity);
+                                        .printf(
+                                                "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
+                                                reportSeverity, failSeverity);
+                                throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
-                            listener.getLogger().println("Model has severity level MEDIUM");
                             break;
                         case HIGH:
                             if (failSeverity == SeverityEnum.HIGH
                                     || failSeverity == SeverityEnum.MEDIUM
                                     || failSeverity == SeverityEnum.LOW) {
                                 listener.getLogger()
-                                        .println("Failing build due to model having severity level " + reportSeverity);
-                                throw new AbortException("Model has severity level " + reportSeverity);
+                                        .printf(
+                                                "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
+                                                reportSeverity, failSeverity);
+                                throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
                             break;
                         case CRITICAL:
-                            throw new AbortException("Model has severity level " + reportSeverity);
+                            listener.getLogger()
+                                    .printf(
+                                            "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
+                                            reportSeverity, failSeverity);
+                            throw new AbortException("Model has " + reportSeverity + " severity detection!");
                         default:
                             listener.getLogger().println("Model has unknown severity level");
                             break;
