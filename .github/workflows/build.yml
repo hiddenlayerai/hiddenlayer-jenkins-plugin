@@ -23,6 +23,7 @@ jobs:
         cache: maven
     - name: Run tests with Maven
       uses: devcontainers/ci@v0.3
-      runCmd: |
-        cd hiddenlayer-model-scanner
-        mvn package
+      with:
+        runCmd: |
+          cd hiddenlayer-model-scanner
+          mvn package
