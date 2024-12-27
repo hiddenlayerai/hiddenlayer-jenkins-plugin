@@ -34,8 +34,8 @@ public class HLScanModelBuilderTest {
     final String hlClientId = "client-id";
     final String hlClientSecret = "client-secret";
     final String folderToScan = "folder-to-scan";
-    final private boolean failUnsupported = false;
-    final private String failSeverity = "LOW";
+    final boolean failUnsupported = true;
+    final String failSeverity = "LOW";
 
     // This text is printed to the console when the plugin is run.
     final String scanMessage = String.format("Scanning model %s in folder %s", modelName, folderToScan);
