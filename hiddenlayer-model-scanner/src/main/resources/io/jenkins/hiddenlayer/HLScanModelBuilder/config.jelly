@@ -18,6 +18,12 @@
         <f:checkbox/>
     </f:entry>
     <f:entry title="Fail on Severity" field="failOnSeverity">
-        <f:textbox/>
+        <select name="failOnSeverity">
+        <option value="">Don't Fail Build</option>
+        <option value="LOW">Low</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HIGH">High</option>
+        <option value="CRITICAL">Critical</option>
+    </select>
     </f:entry>
 </j:jelly>
