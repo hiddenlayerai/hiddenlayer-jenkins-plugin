@@ -34,6 +34,8 @@ public class HLScanModelBuilderTest {
     final String hlClientId = "client-id";
     final String hlClientSecret = "client-secret";
     final String folderToScan = "folder-to-scan";
+    final private boolean failUnsupported = false;
+    final private String failSeverity = "LOW";
 
     // This text is printed to the console when the plugin is run.
     final String scanMessage = String.format("Scanning model %s in folder %s", modelName, folderToScan);
@@ -43,8 +45,6 @@ public class HLScanModelBuilderTest {
     private String modelVersion = "1.0.0";
     private String modelId = "model-id";
     private String scanId = "scan-id";
-    private boolean failUnsupported = false;
-    private String failSeverity = "LOW";
 
     @Before
     public void setUp() throws IOException, URISyntaxException, InterruptedException, Exception {
@@ -77,7 +77,8 @@ public class HLScanModelBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
+        HLScanModelBuilder builder = new HLScanModelBuilder(
+                modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
         project.getBuildersList().add(builder);
 
         // Save and reload the project configuration
@@ -115,6 +116,8 @@ public class HLScanModelBuilderTest {
                 + "', hlClientId: '" + hlClientId
                 + "', hlClientSecret: '" + hlClientSecret
                 + "', folderToScan: '" + folderToScan
+                + "', failOnUnsupported: " + failUnsupported
+                + ", failOnSeverity: '" + failSeverity
                 + "'}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
@@ -125,7 +128,8 @@ public class HLScanModelBuilderTest {
     }
 
     private HLScanModelBuilder createBuilder() {
-        HLScanModelBuilder builder = new HLScanModelBuilder(modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
+        HLScanModelBuilder builder = new HLScanModelBuilder(
+                modelName, hlClientId, hlClientSecret, folderToScan, failUnsupported, failSeverity);
         builder.setModelScanService(mockModelScanService);
         return builder;
     }

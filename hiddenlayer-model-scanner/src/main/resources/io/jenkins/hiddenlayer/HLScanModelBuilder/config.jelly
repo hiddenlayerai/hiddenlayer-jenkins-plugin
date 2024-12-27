@@ -14,4 +14,7 @@
     <f:entry title="Folder to Scan" field="folderToScan">
         <f:textbox/>
     </f:entry>
+    <f:entry title="Fail Pipeline on Unsupported model" field="failOnUnsupported">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>

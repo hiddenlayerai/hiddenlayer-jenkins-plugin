@@ -2,6 +2,7 @@ package io.jenkins.hiddenlayer;
 
 import com.hiddenlayer.sdk.ModelScanService;
 import com.hiddenlayer.sdk.rest.models.ScanReportV3;
+import com.hiddenlayer.sdk.rest.models.ScanReportV3.SeverityEnum;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -50,7 +51,13 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
     private transient ModelScanService modelScanService;
 
     @DataBoundConstructor
-    public HLScanModelBuilder(String modelName, String hlClientId, String hlClientSecret, String folderToScan, boolean failOnUnsupported, String failOnSeverity) {
+    public HLScanModelBuilder(
+            String modelName,
+            String hlClientId,
+            String hlClientSecret,
+            String folderToScan,
+            boolean failOnUnsupported,
+            String failOnSeverity) {
         this.modelName = modelName;
         this.hlClientId = hlClientId;
         setHlClientSecret(hlClientSecret);
@@ -158,21 +165,26 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                     switch (reportSeverity) {
                         case LOW:
                             if (failSeverity == SeverityEnum.LOW) {
-                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                                listener.getLogger()
+                                        .println("Failing build due to model having severity level " + reportSeverity);
                                 throw new AbortException("Model has severity level " + reportSeverity);
                             }
                             listener.getLogger().println("Model has severity level LOW");
                             break;
                         case MEDIUM:
                             if (failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
-                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                                listener.getLogger()
+                                        .println("Failing build due to model having severity level " + reportSeverity);
                                 throw new AbortException("Model has severity level " + reportSeverity);
                             }
                             listener.getLogger().println("Model has severity level MEDIUM");
                             break;
                         case HIGH:
-                            if (failSeverity == SeverityEnum.HIGH || failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
-                                listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                            if (failSeverity == SeverityEnum.HIGH
+                                    || failSeverity == SeverityEnum.MEDIUM
+                                    || failSeverity == SeverityEnum.LOW) {
+                                listener.getLogger()
+                                        .println("Failing build due to model having severity level " + reportSeverity);
                                 throw new AbortException("Model has severity level " + reportSeverity);
                             }
                             break;
@@ -183,7 +195,8 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                             break;
                     }
                     if (reportSeverity.compareTo(failSeverity) >= 0) {
-                        listener.getLogger().println("Failing build due to model having severity level " + reportSeverity);
+                        listener.getLogger()
+                                .println("Failing build due to model having severity level " + reportSeverity);
                         throw new AbortException("Model has severity level " + reportSeverity);
                     }
                 }
@@ -260,7 +273,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.ok();
             }
             String severity = value.trim().toLowerCase();
-            switch(severity) {
+            switch (severity) {
                 case "low":
                 case "medium":
                 case "high":
