@@ -157,7 +157,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
             if (failOnUnsupported && report.getSeverity() == SeverityEnum.UNKNOWN) {
                 throw new AbortException("Model type is not supported by HiddenLayer");
             }
-            if (!failOnSeverity.isEmpty()) {
+            if (!failOnSeverity.trim().isEmpty()) {
                 SeverityEnum reportSeverity = report.getSeverity();
                 // just kick out if SAFE or UNKNOWN
                 if (reportSeverity != SeverityEnum.UNKNOWN && reportSeverity != SeverityEnum.SAFE) {
@@ -193,11 +193,6 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                         default:
                             listener.getLogger().println("Model has unknown severity level");
                             break;
-                    }
-                    if (reportSeverity.compareTo(failSeverity) >= 0) {
-                        listener.getLogger()
-                                .println("Failing build due to model having severity level " + reportSeverity);
-                        throw new AbortException("Model has severity level " + reportSeverity);
                     }
                 }
             }
