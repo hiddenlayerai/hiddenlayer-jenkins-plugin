@@ -46,6 +46,7 @@ jobs:
         with:
           imageName: "ghcr.io/hiddenlayerai/hiddenlayer-jenkins-plugin-devcontainer"
           cacheFrom: "ghcr.io/hiddenlayerai/hiddenlayer-jenkins-plugin-devcontainer"
+          push: always
   
   analyze:
     name: Analyze
