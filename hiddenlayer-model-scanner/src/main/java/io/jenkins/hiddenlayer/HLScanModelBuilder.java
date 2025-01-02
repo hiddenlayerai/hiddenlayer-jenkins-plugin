@@ -9,6 +9,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -21,6 +22,7 @@ import java.io.StringWriter;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -242,10 +244,17 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
         // Form validations
 
         @POST
-        public FormValidation doCheckModelName(@QueryParameter String value) {
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
+        public FormValidation doCheckModelName(@QueryParameter String value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
+            if (value.trim().isEmpty()) {
+                return FormValidation.error("Model Name cannot be empty");
             }
+            return FormValidation.ok();
+        }
+
+        @POST
+        public FormValidation doCheckHlClientId(@QueryParameter String value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
             if (value.trim().isEmpty()) {
                 return FormValidation.error("Client ID cannot be empty");
             }
@@ -253,21 +262,8 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
         }
 
         @POST
-        public FormValidation doCheckHlClientId(@QueryParameter String value) {
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
-            }
-            if (value.trim().isEmpty()) {
-                return FormValidation.error("Client ID cannot be empty");
-            }
-            return FormValidation.ok();
-        }
-
-        @POST
-        public FormValidation doCheckHlClientSecret(@QueryParameter String value) {
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
-            }
+        public FormValidation doCheckHlClientSecret(@QueryParameter String value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
             if (value.trim().isEmpty()) {
                 return FormValidation.error("Client Secret cannot be empty");
             }
@@ -275,22 +271,23 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
         }
 
         @POST
-        public FormValidation doCheckFolderToScan(@QueryParameter String value) {
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
-            }
+        public FormValidation doCheckFolderToScan(@QueryParameter String value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
             if (value.trim().isEmpty()) {
                 return FormValidation.error("Folder to scan cannot be empty");
             }
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckFailOnUnsupported(@QueryParameter boolean value) {
+        @POST
+        public FormValidation doCheckFailOnUnsupported(@QueryParameter boolean value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
             return FormValidation.ok();
         }
 
         @POST
-        public FormValidation doCheckFailOnSeverity(@QueryParameter String value) {
+        public FormValidation doCheckFailOnSeverity(@QueryParameter String value, @AncestorInPath Item item) {
+            item.checkPermission(Item.CONFIGURE);
             if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
                 return FormValidation.ok();
             }
