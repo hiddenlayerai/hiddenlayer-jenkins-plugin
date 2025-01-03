@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -299,33 +298,6 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                 return FormValidation.error("Folder to scan cannot be empty");
             }
             return FormValidation.ok();
-        }
-
-        @POST
-        public FormValidation doCheckFailOnUnsupported(@QueryParameter boolean value, @AncestorInPath Item item) {
-            item.checkPermission(Item.CONFIGURE);
-            return FormValidation.ok();
-        }
-
-        @POST
-        public FormValidation doCheckFailOnSeverity(@QueryParameter String value, @AncestorInPath Item item) {
-            item.checkPermission(Item.CONFIGURE);
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
-            }
-            if (value == null || value.trim().isEmpty()) {
-                return FormValidation.ok();
-            }
-            String severity = value.trim().toLowerCase();
-            switch (severity) {
-                case "low":
-                case "medium":
-                case "high":
-                case "critical":
-                    return FormValidation.ok();
-                default:
-                    return FormValidation.error("Invalid severity level: " + severity);
-            }
         }
     }
 }
