@@ -7,21 +7,25 @@ import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -151,9 +155,27 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
 
             // Scan the model in folderToScan
             FilePath folderPath = new FilePath(workspace, folderToScan);
-            String folder = folderPath.getRemote();
-            // The last arg to scanFolder is waitForDone
-            ScanReportV3 report = modelScanService.scanFolder(folder, modelName, true);
+            ScanReportV3 report = folderPath.act(new FileCallable<ScanReportV3>() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public ScanReportV3 invoke(File f, VirtualChannel channel) {
+                    String folder = f.getAbsolutePath();
+                    try {
+                        // The last arg to scanFolder is waitForDone
+                        ScanReportV3 report = modelScanService.scanFolder(folder, modelName, true);
+                        return report;
+                    } catch (Exception e) {
+                        listener.getLogger().println("Error scanning model: " + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void checkRoles(RoleChecker checker) throws SecurityException {
+                    // no-op
+                }
+            });
 
             // Summarize the scan results for the user
             String summary = ScanReporter.summarizeScan(report);
