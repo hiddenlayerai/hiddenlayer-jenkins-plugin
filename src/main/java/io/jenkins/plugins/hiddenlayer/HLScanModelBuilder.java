@@ -52,7 +52,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
     private boolean failOnUnsupported;
 
     // Fail the build if the model has a severity level greater than or equal to the specified level
-    private String failOnSeverity;
+    private FailOnDetectionSeverityEnum failOnSeverity;
 
     // Service used to call the HiddenLayer Model Scanner.
     // Mark it as transient so it won't be serialized with the object, to avoid security problems.
@@ -65,7 +65,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
             String hlClientSecret,
             String folderToScan,
             boolean failOnUnsupported,
-            String failOnSeverity) {
+            FailOnDetectionSeverityEnum failOnSeverity) {
         this.modelName = modelName;
         this.hlClientId = hlClientId;
         setHlClientSecret(hlClientSecret);
@@ -119,12 +119,12 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
         this.failOnUnsupported = failOnUnsupported;
     }
 
-    public String getFailOnSeverity() {
+    public FailOnDetectionSeverityEnum getFailOnSeverity() {
         return failOnSeverity;
     }
 
     @DataBoundSetter
-    public void setFailOnSeverity(String failOnSeverity) {
+    public void setFailOnSeverity(FailOnDetectionSeverityEnum failOnSeverity) {
         this.failOnSeverity = failOnSeverity;
     }
 
@@ -183,38 +183,38 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
             if (failOnUnsupported && report.getSeverity() == SeverityEnum.UNKNOWN) {
                 throw new AbortException("Model type is not supported by HiddenLayer");
             }
-            if (!failOnSeverity.trim().isEmpty()) {
+            if (failOnSeverity != FailOnDetectionSeverityEnum.NONE) {
                 SeverityEnum reportSeverity = report.getSeverity();
                 // just kick out if SAFE or UNKNOWN
                 if (reportSeverity != SeverityEnum.UNKNOWN && reportSeverity != SeverityEnum.SAFE) {
-                    SeverityEnum failSeverity = SeverityEnum.valueOf(failOnSeverity.toUpperCase());
                     switch (reportSeverity) {
                         case LOW:
-                            if (failSeverity == SeverityEnum.LOW) {
+                            if (failOnSeverity == FailOnDetectionSeverityEnum.LOW) {
                                 listener.getLogger()
                                         .printf(
                                                 "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
-                                                reportSeverity, failSeverity);
+                                                reportSeverity, failOnSeverity);
                                 throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
                             break;
                         case MEDIUM:
-                            if (failSeverity == SeverityEnum.MEDIUM || failSeverity == SeverityEnum.LOW) {
+                            if (failOnSeverity == FailOnDetectionSeverityEnum.MEDIUM
+                                    || failOnSeverity == FailOnDetectionSeverityEnum.LOW) {
                                 listener.getLogger()
                                         .printf(
                                                 "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
-                                                reportSeverity, failSeverity);
+                                                reportSeverity, failOnSeverity);
                                 throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
                             break;
                         case HIGH:
-                            if (failSeverity == SeverityEnum.HIGH
-                                    || failSeverity == SeverityEnum.MEDIUM
-                                    || failSeverity == SeverityEnum.LOW) {
+                            if (failOnSeverity == FailOnDetectionSeverityEnum.HIGH
+                                    || failOnSeverity == FailOnDetectionSeverityEnum.MEDIUM
+                                    || failOnSeverity == FailOnDetectionSeverityEnum.LOW) {
                                 listener.getLogger()
                                         .printf(
                                                 "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
-                                                reportSeverity, failSeverity);
+                                                reportSeverity, failOnSeverity);
                                 throw new AbortException("Model has " + reportSeverity + " severity detection!");
                             }
                             break;
@@ -222,7 +222,7 @@ public class HLScanModelBuilder extends Builder implements SimpleBuildStep {
                             listener.getLogger()
                                     .printf(
                                             "Failing build due to model scan having a %s severity detection (threshold: %s)%n",
-                                            reportSeverity, failSeverity);
+                                            reportSeverity, failOnSeverity);
                             throw new AbortException("Model has " + reportSeverity + " severity detection!");
                         default:
                             listener.getLogger().println("Model has unknown severity level");
