@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.3</version>
+    <version>4.88</version>
     <!-- See https://github.com/jenkinsci/plugin-pom/releases for available versions-->
     <relativePath />
   </parent>
@@ -35,7 +35,7 @@
     <changelist>-SNAPSHOT</changelist>
 
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-    <jenkins.version>2.479.2</jenkins.version>
+    <jenkins.version>2.452.4</jenkins.version>
     <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
 
     <spotless.check.skip>false</spotless.check.skip>
@@ -52,8 +52,8 @@
       <dependency>
         <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.479.x</artifactId>
-        <version>3814.v9563d972079a_</version>
+        <artifactId>bom-2.452.x</artifactId>
+        <version>3875.v1df09947cde6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
